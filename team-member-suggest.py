@@ -1,3 +1,5 @@
+import random
+
 attackingDict = {'bug': {'bug': 1.0, 'dark': 2.0, 'dragon': 1.0, 'electric': 1.0, 'fairy': 1.0, 
                           'fighting': 0.5, 'fire': 0.5, 'flying': 0.5, 'ghost': 0.5, 'grass': 2.0, 
                           'ground': 1.0, 'ice': 1.0, 'normal': 1.0, 'poison': 0.5, 'psychic': 2.0, 'rock': 1.0, 'steel': 0.5, 'water': 1.0},
@@ -387,72 +389,60 @@ pokedex = [Rillaboom ,  Cinderace ,  Inteleon ,  Orbeetle ,  Butterfree ,  Vikav
            Dramanitan ,  Stunfisk]
 
 def howEffective(attacker = Pokemon, defender = Pokemon):
-  print(attacker.name + ' vs ' + defender.name + ':')
-  if defender.type2 == 'none':
-    print('%s: %.2f' % (attacker.type1, attackingDict[attacker.type1][defender.type1]))
-  else:
-    print('%s: %.2f' % (attacker.type1, attackingDict[attacker.type1][defender.type1] * attackingDict[attacker.type1][defender.type2]))
-  if not attacker.type2 == 'none':
-    if defender.type2 == 'none':
-      print('%s: %.2f' % (attacker.type2, attackingDict[attacker.type2][defender.type1]))
-    else:
-      print('%s: %.2f' % (attacker.type2, attackingDict[attacker.type2][defender.type1] * attackingDict[attacker.type2][defender.type2]))
+      print(attacker.name + ' vs ' + defender.name + ':')
+      if defender.type2 == 'none':
+          print('%s: %.2f' % (attacker.type1, attackingDict[attacker.type1][defender.type1]))
+      else:
+          print('%s: %.2f' % (attacker.type1, attackingDict[attacker.type1][defender.type1] * attackingDict[attacker.type1][defender.type2]))
+      if not attacker.type2 == 'none':
+          if defender.type2 == 'none':
+              print('%s: %.2f' % (attacker.type2, attackingDict[attacker.type2][defender.type1]))
+          else:
+              print('%s: %.2f' % (attacker.type2, attackingDict[attacker.type2][defender.type1] * attackingDict[attacker.type2][defender.type2]))
 
 class Team:
-  def __init__(self, name):
-    self.name = name
-  members = []
+    def __init__(self, name):
+        self.name = name
+    members = []
 
 # Computes a list of scores that represents the need for each type
 def calcTeamTypeScore(team = Team):
-  typeScore = {'bug': 0.0, 'dark': 0.0, 'dragon': 0.0, 'electric': 0.0, 'fairy': 0.0, 
-                          'fighting': 0.0, 'fire': 0.0, 'flying': 0.0, 'ghost': 0.0, 'grass': 0.0, 'ground': 0.0, 'ice': 0.0, 'normal': 0.0, 'poison': 0.0, 'psychic': 0.0, 'rock': 0.0, 'steel': 0.0, 'water': 0.0}
-  for atkType in attackingDict:
-    for defType in attackingDict:
-      currScore = attackingDict[atkType][defType]
-      # (TEMPORARILY COMMENTED OUT)If a type is super-effective against a type a team member already
-      # covers, reduce that type's score
-      for i in team.members:
-        memberScore1 = attackingDict[i.type1][defType]
-        if (i.type1 == atkType):
-          typeScore[atkType] -= 1.0
-        if (memberScore1 == currScore and currScore == 2.0):
-          typeScore[atkType] -= currScore
-        if (memberScore1 < 1.0) and (currScore > 1.0):
-          typeScore[atkType] += currScore
-        if (memberScore1 > 1.0) and (currScore < 1.0):
-          typeScore[atkType] -= currScore
-        # Type 2 Offense
-        if not i.type2 == 'none':
-          memberScore2 = attackingDict[i.type2][defType]
-          if (i.type2 == atkType):
-            typeScore[atkType] -= 1.0
-          if (memberScore2 == currScore and currScore == 2.0):
-            typeScore[atkType] -= currScore
-          if (memberScore1 < 1.0) and (currScore > 1.0):
-            typeScore[atkType] += currScore
-          if (memberScore1 > 1.0) and (currScore < 1.0):
-            typeScore[atkType] -= currScore
-        # Calculate defensive scoring
-        memberDefScore = attackingDict[atkType][i.type1]
-        if not i.type2 == 'none':
-            memberDefScore += attackingDict[atkType][i.type2]
-        if (memberDefScore < 1.0) and (currScore > 1.0):
-          typeScore[defType] -= currScore
-        if (memberDefScore > 1.0) and (currScore < 1.0):
-          typeScore[defType] += currScore
-  # TODO: Lower score if offensive typing is already 
-  # covered and increase score if team is weak to 
-  return typeScore
-
-def calcBestType(table):
-  bestScore = table['bug']
-  bestType = 'bug'
-  for i in table:
-    if table[i] > bestScore:
-      bestScore = table[i]
-      bestType = i
-  return bestType
+    typeScore = {'bug': 0.0, 'dark': 0.0, 'dragon': 0.0, 'electric': 0.0, 'fairy': 0.0, 
+                          'fighting': 0.0, 'fire': 0.0, 'flying': 0.0, 'ghost': 0.0, 'grass': 0.0, 'ground': 0.0, 'ice': 0.0, 'normal': 0.0, 'poison': 0.0, 'psychic': 0.0,
+                          'rock': 0.0, 'steel': 0.0, 'water': 0.0}
+    for atkType in attackingDict:
+        for defType in attackingDict:
+            currScore = attackingDict[atkType][defType]
+            for i in team.members:
+                memberScore1 = attackingDict[i.type1][defType]
+                if (i.type1 == atkType):
+                    typeScore[atkType] -= 1.0
+                if (memberScore1 == currScore and currScore == 2.0):
+                    typeScore[atkType] -= currScore
+                if (memberScore1 < 1.0) and (currScore > 1.0):
+                    typeScore[atkType] += currScore
+                if (memberScore1 > 1.0) and (currScore < 1.0):
+                    typeScore[atkType] -= currScore
+                # Type 2 Offense
+                if not i.type2 == 'none':
+                    memberScore2 = attackingDict[i.type2][defType]
+                    if (i.type2 == atkType):
+                        typeScore[atkType] -= 1.0
+                    if (memberScore2 == currScore and currScore == 2.0):
+                        typeScore[atkType] -= currScore
+                    if (memberScore1 < 1.0) and (currScore > 1.0):
+                        typeScore[atkType] += currScore
+                    if (memberScore1 > 1.0) and (currScore < 1.0):
+                        typeScore[atkType] -= currScore
+                    # Calculate defensive scoring
+                    memberDefScore = attackingDict[atkType][i.type1]
+                    if not i.type2 == 'none':
+                        memberDefScore += attackingDict[atkType][i.type2]
+                    if (memberDefScore < 1.0) and (currScore > 1.0):
+                        typeScore[defType] -= currScore
+                    if (memberDefScore > 1.0) and (currScore < 1.0):
+                        typeScore[defType] += currScore
+    return typeScore
 
 def calcPokemonScore(table, pokemon = Pokemon):
   if pokemon.type2 == 'none':
@@ -460,6 +450,8 @@ def calcPokemonScore(table, pokemon = Pokemon):
   else:
     return table[pokemon.type1] + table[pokemon.type2]
 
+# Calculates the best addition based on the pokemon's score from
+# comparison with the current team's type table
 def calcBestAddition(table, team = Team):
   for i in pokedex:
     if i not in team.members:
@@ -474,13 +466,15 @@ def calcBestAddition(table, team = Team):
         bestPokemon = i
   return bestPokemon
 
-#howEffective(Rillaboom, Inteleon)
+def fillTeamWithSuggestions(team = Team):
+    for i in range(6 - len(team.members)):
+        if len(team.members) == 0:
+            team.members.append(random.choice(pokedex))
+        else:
+            table = calcTeamTypeScore(team)
+            team.members.append(calcBestAddition(table, team))
+        print(team.members[i].name)
+    print(table)
+
 team1 = Team('team1')
-team1.members.append(Hydreigon)
-team1.members.append(Mawile)
-team1.members.append(Rhyperior)
-team1.members.append(Salazzle)
-team1.members.append(Ludicolo)
-table = calcTeamTypeScore(team1)
-print(calcTeamTypeScore(team1))
-print(calcBestAddition(table, team1).name)
+fillTeamWithSuggestions(team1)
